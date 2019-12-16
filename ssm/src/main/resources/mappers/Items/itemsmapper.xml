@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hand.wzl25722.mapper.ItemsMapper">
+    <resultMap id="item" type="com.hand.wzl25722.pojo.Items">
+        <result property="itemId" column="item_id"></result>
+        <result property="itemCode" column="item_code"></result>
+        <result property="itemUom" column="item_uom"></result>
+        <result property="iteDescription" column="item_description"></result>
+        <result property="startActiveDate" column="start_active_date"></result>
+        <result property="endActiveDate" column="end_active_date"></result>
+        <result property="enabledFlag" column="enabled_flag"></result>
+    </resultMap>
+    <delete id="deleteItem" >
+        DELETE FROM ssm_item WHERE
+        <if test="itemId!=null">
+            item_id = #{itemId}
+        </if>
+        <if test="list != null and list.size()>0">
+            item_id in
+            <foreach collection="list" open="(" close=")" separator="," item="itemId">
+                #{itemId}
+            </foreach>
+        </if>
+    </delete>
+    <update id="updateItem">
+        UPDATE  ssm_item
+        <set>
+            <if test="updateItemUom != null">
+                item_uom = #{updateItemUom},
+            </if>
+            <if test="updateIteDescription != null">
+                item_description=#{updateIteDescription},
+            </if>
+            <if test="updateStartActiveDate != null">
+                start_active_date=#{updateStartActiveDate},
+            </if>
+            <if test="updateEndActiveDate != null">
+                end_active_date = #{updateEndActiveDate},
+            </if>
+            <if test="updateEnabledFlag != null">
+                enabled_flag = #{updateEnabledFlag}
+            </if>
+        </set>
+        WHERE item_id =#{updateItemId}
+    </update>
+    <insert id="insertSsmItem">
+        INSERT INTO `ssm_item` (`item_code`, `item_uom`, `item_description`, `start_active_date`, `end_active_date`, `enabled_flag`)
+         VALUES(#{itemCode},#{itemUom},#{iteDescription},#{startActiveDate},#{endActiveDate},#{enabledFlag});
+    </insert>
+    <select id="getSsmItems" resultMap="item">
+        SELECT item_id,item_code,item_uom ,item_description,start_active_date,end_active_date,enabled_flag FROM ssm_item
+        <where>
+            <if test="itemId != null">
+                and item_id = #{itemId}
+            </if>
+            <if test="itemSelectCode != null and itemSelectCode != '' ">
+                <bind name="itemSelectCodeLike" value="'%'+itemSelectCode+'%'"/>
+                and item_code like #{itemSelectCodeLike}
+            </if>
+            <if test="iteSelectDescription != null and iteSelectDescription != ''">
+                <bind name="iteSelectDescriptionLike" value="'%'+iteSelectDescription+'%'"/>
+                and item_description like #{iteSelectDescriptionLike}
+            </if>
+            <if test="itemSelectUom != null and itemSelectUom != ''">
+                and item_uom = #{itemSelectUom}
+            </if>
+            <if test="selectStartActiveDate != null and selectStartActiveDate != ''">
+                and start_active_date = #{selectStartActiveDate}
+            </if>
+            <if test="selectEndActiveDate != null and selectEndActiveDate != ''">
+                and end_active_date = #{selectEndActiveDate}
+            </if>
+            <if test="selectEnabledFlag != null and selectEnabledFlag != ''">
+                and enabled_flag = #{selectEnabledFlag}
+            </if>
+        </where>
+    </select>
+    <select id="getItemCode" resultType="java.lang.Integer">
+        SELECT SUBSTR(MAX(item_code),5,14)+1 FROM ssm_item
+    </select>
+
+
+</mapper>
